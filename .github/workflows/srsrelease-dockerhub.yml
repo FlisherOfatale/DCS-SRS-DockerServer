@@ -1,0 +1,72 @@
+name: Build Linux Binary, Container Image and Push to Docker Hub
+
+on:
+  workflow_dispatch:
+    inputs:
+      srs_tag:
+        description: 'SRS Version tag (optional, defaults to latest SRS Release)'
+        required: false
+        default: ''
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Checkout DCS-SimpleRadioStandalone repository
+        uses: actions/checkout@v4
+        with:
+          repository: ciribob/DCS-SimpleRadioStandalone
+          ref: master # or specify a branch/tag/commit if needed
+          path: external-repo # this is the directory where it will be checked out
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Get SRS release tag
+        id: get_srs_tag
+        run: |
+          if [ -z "${{ github.event.inputs.srs_tag }}" ]; then
+            # Get the latest release tag from GitHub API
+            TAG=$(curl -s https://api.github.com/repos/ciribob/DCS-SimpleRadioStandalone/releases/latest | jq -r .tag_name)
+          else
+            TAG="${{ github.event.inputs.srs_tag }}"
+          fi
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+      - name: Download SRS release zip
+        run: |
+          ASSET_URL=$(curl -s https://api.github.com/repos/ciribob/DCS-SimpleRadioStandalone/releases/tags/${{ steps.get_srs_tag.outputs.tag }} | jq -r '.assets[] | select(.name | test("^DCS-SimpleRadioStandalone-.*\\.zip$")) | .browser_download_url')
+          if [ -z "$ASSET_URL" ]; then
+            echo "Could not find DCS-SimpleRadioStandalone-<version>.zip asset for tag ${{ steps.get_srs_tag.outputs.tag }}"
+            exit 1
+          fi
+          curl -L "$ASSET_URL" -o ServerCommandLine.zip
+          unzip -o external-repo/ServerCommandLine.zip -d install-build/ServerCommandLine-Linux/
+
+      - name: Set Docker tags
+        id: set_tags
+        run: |
+          TAG="${{ steps.get_srs_tag.outputs.tag }}"
+          TAGS="${{ secrets.DOCKERHUB_USERNAME }}/dcs-srs-server:srs-${TAG}"
+          if [[ "${{ github.event.inputs.tag_latest }}" == "true" ]]; then
+            TAGS="$TAGS,${{ secrets.DOCKERHUB_USERNAME }}/dcs-srs-server:latest"
+          fi
+          echo "tags=$TAGS" >> $GITHUB_OUTPUT
+
+      - name: Build and Push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ steps.set_tags.outputs.tags }}
