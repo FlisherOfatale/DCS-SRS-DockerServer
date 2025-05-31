@@ -44,7 +44,7 @@ jobs:
         run: |
           curl -X POST \
             -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "Authorization: Bearer ${{ secrets.PAT_REPO_DISPATCH }}" \
             https://api.github.com/repos/${{ github.repository }}/dispatches \
             -d '{"event_type":"srsrelease","client_payload":{"srs_tag":"${{ steps.get_tag.outputs.tag }}"}}'
 
@@ -55,6 +55,6 @@ jobs:
         run: |
           curl -X POST \
             -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "Authorization: Bearer ${{ secrets.PAT_REPO_DISPATCH }}" \
             https://api.github.com/repos/${{ github.repository }}/dispatches \
             -d '{"event_type":"linuxbuild","client_payload":{"srs_tag":"${{ steps.get_tag.outputs.tag }}"}}'
