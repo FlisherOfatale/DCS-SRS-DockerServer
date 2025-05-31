@@ -13,8 +13,8 @@ externalRepoPath="./external-repos"
 echo "Publishing ServerCommandLine for Linux..."
 
 rm -rf "$outputPath/ServerCommandLine-Linux"
-dotnet clean "./$externalRepoPath/ServerCommandLine/ServerCommandLine.csproj"
-dotnet publish "./$externalRepoPath/ServerCommandLine/ServerCommandLine.csproj" \
+dotnet clean "$externalRepoPath/ServerCommandLine/ServerCommandLine.csproj"
+dotnet publish "$externalRepoPath/ServerCommandLine/ServerCommandLine.csproj" \
     --framework net8.0 \
     --runtime linux-x64 \
     --output "$outputPath/ServerCommandLine-Linux" \
