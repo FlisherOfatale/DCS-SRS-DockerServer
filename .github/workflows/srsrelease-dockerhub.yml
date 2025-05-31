@@ -43,9 +43,9 @@ jobs:
             echo "Could not find DCS-SimpleRadioStandalone-<version>.zip asset for tag ${{ steps.get_srs_tag.outputs.tag }}"
             exit 1
           fi
-          curl -L "$ASSET_URL" -o ServerCommandLine.zip
+          curl -L "$ASSET_URL" -o DCS-SimpleRadioStandalone.zip
           mkdir -p install-build/ServerCommandLine-Linux
-          unzip -o ServerCommandLine.zip -d install-build/ServerCommandLine-Linux/
+          unzip -j DCS-SimpleRadioStandalone.zip 'ServerCommandLine-Linux/SRS-Server-Commandline' -d install-build/ServerCommandLine-Linux/SRS-Server-Commandline
 
       - name: Set Docker tags
         id: set_tags
