@@ -44,6 +44,7 @@ jobs:
             exit 1
           fi
           curl -L "$ASSET_URL" -o ServerCommandLine.zip
+          mkdir -p install-build/ServerCommandLine-Linux
           unzip -o ServerCommandLine.zip -d install-build/ServerCommandLine-Linux/
 
       - name: Set Docker tags
