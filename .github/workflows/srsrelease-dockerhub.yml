@@ -29,8 +29,8 @@ jobs:
         id: get_srs_tag
         run: |
           if [ -z "${{ github.event.inputs.srs_tag }}" ]; then
-            # Get the latest release tag from GitHub API
-            TAG=$(curl -s https://api.github.com/repos/ciribob/DCS-SimpleRadioStandalone/releases/latest | jq -r .tag_name)
+            # Get the most recent release (including pre-releases)
+            TAG=$(curl -s https://api.github.com/repos/ciribob/DCS-SimpleRadioStandalone/releases | jq -r '.[0].tag_name')
           else
             TAG="${{ github.event.inputs.srs_tag }}"
           fi
