@@ -1,0 +1,5 @@
+# Ignore local clone of external repository
+external-repos/
+
+# Ignore build artifacts
+install-build/
