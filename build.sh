@@ -7,7 +7,7 @@
 set -e
 
 outputPath="./install-build"
-externalRepoPath="./external-repos"
+externalRepoPath="./external-repo"
 
 # Server Command Line - Linux
 echo "Publishing ServerCommandLine for Linux..."
