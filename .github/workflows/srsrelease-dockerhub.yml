@@ -1,4 +1,4 @@
-name: Build Linux Binary, Container Image and Push to Docker Hub
+name: Fetch SRS Released binary and Publish to Docker Hub
 
 on:
   workflow_dispatch:
@@ -16,13 +16,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Checkout DCS-SimpleRadioStandalone repository
-        uses: actions/checkout@v4
-        with:
-          repository: ciribob/DCS-SimpleRadioStandalone
-          ref: master # or specify a branch/tag/commit if needed
-          path: external-repo # this is the directory where it will be checked out
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -36,8 +29,8 @@ jobs:
         id: get_srs_tag
         run: |
           if [ -z "${{ github.event.inputs.srs_tag }}" ]; then
-            # Get the latest release tag from GitHub API
-            TAG=$(curl -s https://api.github.com/repos/ciribob/DCS-SimpleRadioStandalone/releases/latest | jq -r .tag_name)
+            # Get the most recent release (including pre-releases)
+            TAG=$(curl -s https://api.github.com/repos/ciribob/DCS-SimpleRadioStandalone/releases | jq -r '.[0].tag_name')
           else
             TAG="${{ github.event.inputs.srs_tag }}"
           fi
@@ -50,8 +43,9 @@ jobs:
             echo "Could not find DCS-SimpleRadioStandalone-<version>.zip asset for tag ${{ steps.get_srs_tag.outputs.tag }}"
             exit 1
           fi
-          curl -L "$ASSET_URL" -o ServerCommandLine.zip
-          unzip -o external-repo/ServerCommandLine.zip -d install-build/ServerCommandLine-Linux/
+          curl -L "$ASSET_URL" -o DCS-SimpleRadioStandalone.zip
+          mkdir -p install-build/ServerCommandLine-Linux
+          unzip -j DCS-SimpleRadioStandalone.zip 'ServerCommandLine-Linux/SRS-Server-Commandline' -d install-build/ServerCommandLine-Linux/SRS-Server-Commandline
 
       - name: Set Docker tags
         id: set_tags

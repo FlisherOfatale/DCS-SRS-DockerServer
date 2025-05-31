@@ -1,0 +1,60 @@
+name: Check SRS Release and Trigger Build
+
+on:
+#  schedule:
+#    - cron: '0 * * * *' # Runs every hour
+  workflow_dispatch:
+
+jobs:
+  check-and-trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get latest SRS release tag (including pre-releases)
+        id: get_tag
+        run: |
+          TAG=$(curl -s https://api.github.com/repos/ciribob/DCS-SimpleRadioStandalone/releases | jq -r '.[0].tag_name')
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+      - name: Check if Docker Hub tag exists (srs-TAG)
+        id: check_srs
+        run: |
+          TAG="${{ steps.get_tag.outputs.tag }}"
+          EXISTS=$(curl -s "https://hub.docker.com/v2/repositories/flisher/dcs-srs-server/tags/srs-${TAG}/" | jq -r '.name // empty')
+          if [ "$EXISTS" = "srs-${TAG}" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check if Docker Hub tag exists (compiled-TAG)
+        id: check_compiled
+        run: |
+          TAG="${{ steps.get_tag.outputs.tag }}"
+          EXISTS=$(curl -s "https://hub.docker.com/v2/repositories/flisher/dcs-srs-server/tags/compiled-${TAG}/" | jq -r '.name // empty')
+          if [ "$EXISTS" = "compiled-${TAG}" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Trigger srsrelease-dockerhub.yml if srs-TAG is missing
+        if: steps.check_srs.outputs.exists == 'false'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          curl -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            https://api.github.com/repos/${{ github.repository }}/dispatches \
+            -d '{"event_type":"srsrelease","client_payload":{"srs_tag":"${{ steps.get_tag.outputs.tag }}"}}'
+
+      - name: Trigger linuxbuild-dockerhub.yml if compiled-TAG is missing
+        if: steps.check_compiled.outputs.exists == 'false'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          curl -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            https://api.github.com/repos/${{ github.repository }}/dispatches \
+            -d '{"event_type":"linuxbuild","client_payload":{"srs_tag":"${{ steps.get_tag.outputs.tag }}"}}'
