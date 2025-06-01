@@ -2,7 +2,7 @@ name: Auto Update from SRS Repository
 
 on:
   schedule:
-    - cron: '0 * * * *' # Runs every hour
+    - cron: '*/5 * * * *' # Runs every 5 minutes
   workflow_dispatch:
 
 jobs:
