@@ -63,19 +63,19 @@ All images are published to:
 
 ## Usage
 
-### Pulling a Released Version using a binary compiled from the source
+### Pulling a version using a binary compiled from the latest source
 
 ```sh
 docker pull flisher/dcs-srs-server:latest
 ```
 
-### Pulling a Released Version using a binary compiled from the source
+### Pulling a Released version using a binary compiled from the source linked to that release
 
 ```sh
 docker pull flisher/dcs-srs-server:compiled-2.2.0.2
 ```
 
-### Pulling a Released Version using official binary
+### Pulling a Released version using the official binary
 
 ```sh
 docker pull flisher/dcs-srs-server:srs-2.2.0.2
