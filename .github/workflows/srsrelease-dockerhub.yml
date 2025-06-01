@@ -1,14 +1,14 @@
 name: SRS Release to DockerHub
 
 on:
+  repository_dispatch:
+    types: [srsrelease]
   workflow_dispatch:
     inputs:
       srs_tag:
         description: 'SRS Version tag (optional, defaults to latest SRS Release)'
         required: false
         default: ''
-  repository_dispatch:
-    types: [srsrelease]
 
 jobs:
   build:
