@@ -40,7 +40,7 @@ jobs:
           elif [ -n "${{ github.event.client_payload.tag_latest }}" ]; then
             echo "tag_latest=${{ github.event.client_payload.tag_latest }}" >> $GITHUB_OUTPUT
           elif [ "${{ github.event_name }}" = "repository_dispatch" ]; then
-            echo "tag_latest=true" >> $GITHUB_OUTPUT
+            echo "tag_latest=false" >> $GITHUB_OUTPUT
           else
             echo "tag_latest=false" >> $GITHUB_OUTPUT
           fi
