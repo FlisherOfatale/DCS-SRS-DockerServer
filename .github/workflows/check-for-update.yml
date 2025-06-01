@@ -63,12 +63,12 @@ jobs:
           DATE=$(date +%Y%m%d)
           echo "shortsha=$SHORTSHA" >> $GITHUB_OUTPUT
 
-      - name: Check if Docker Hub tag exists (compiled-*-SHORTSHA)
+      - name: Check if Docker Hub tag exists (*-SHORTSHA)
         id: check_compiled_sha
         run: |
           SHORTSHA="${{ steps.get_master_sha.outputs.shortsha }}"
-          # Get all tags and check if any end with the short SHA
-          EXISTS=$(curl -s "https://hub.docker.com/v2/repositories/flisher/dcs-srs-server/tags/?page_size=100" | jq -r '.results[].name' | grep -E "^compiled-.*-${SHORTSHA}$" || true)
+          # Get all tags and check if any end with -SHORTSHA (regardless of prefix)
+          EXISTS=$(curl -s "https://hub.docker.com/v2/repositories/flisher/dcs-srs-server/tags/?page_size=100" | jq -r '.results[].name' | grep -E "-${SHORTSHA}$" || true)
           if [ -n "$EXISTS" ]; then
             echo "exists=true" >> $GITHUB_OUTPUT
           else
