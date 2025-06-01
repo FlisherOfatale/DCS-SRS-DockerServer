@@ -1,4 +1,4 @@
-name: Build Linux Binary, Container Image and Push to Docker Hub
+name: Build to DockerHub
 
 on:
   repository_dispatch:
