@@ -1,8 +1,8 @@
-name: Check SRS Release and Trigger Build
+name: Auto Update from SRS Repository
 
 on:
-#  schedule:
-#    - cron: '0 * * * *' # Runs every hour
+  schedule:
+    - cron: '0 * * * *' # Runs every hour
   workflow_dispatch:
 
 jobs:

@@ -1,4 +1,4 @@
-name: Build to DockerHub
+name: Linux Build to DockerHub
 
 on:
   repository_dispatch:
