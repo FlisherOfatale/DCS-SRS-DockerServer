@@ -53,7 +53,7 @@ jobs:
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer ${{ secrets.PAT_REPO_DISPATCH }}" \
             https://api.github.com/repos/${{ github.repository }}/dispatches \
-            -d '{"event_type":"linuxbuild","client_payload":{"srs_tag":"${{ steps.get_tag.outputs.tag }}"}}'
+            -d '{"event_type":"linuxbuild-from-SRS-release","client_payload":{"srs_tag":"${{ steps.get_tag.outputs.tag }}"}}'
 
       - name: Get latest commit short SHA from master
         id: get_master_sha
@@ -82,4 +82,4 @@ jobs:
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer ${{ secrets.PAT_REPO_DISPATCH }}" \
             https://api.github.com/repos/${{ github.repository }}/dispatches \
-            -d '{"event_type":"linuxbuild","client_payload":{"srs_tag":"","tag_latest":"true"}}'
+            -d '{"event_type":"linuxbuild-from-SRS-commit","client_payload":{"srs_tag":"","tag_latest":"true"}}'

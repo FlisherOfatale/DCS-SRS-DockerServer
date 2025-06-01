@@ -2,7 +2,7 @@ name: Build to DockerHub
 
 on:
   repository_dispatch:
-    types: [linuxbuild]
+    types: [linuxbuild-from-SRS-release, linuxbuild-from-SRS-commit]
   workflow_dispatch:
     inputs:
       tag_latest:
