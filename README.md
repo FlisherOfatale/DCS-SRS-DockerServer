@@ -9,14 +9,6 @@ DCS SRS Docker Container for the Linux CLI
 This project provides an **automated build system** for Docker images of the [DCS SimpleRadioStandalone (SRS) Server](https://github.com/ciribob/DCS-SimpleRadioStandalone) Linux CLI version.  
 Built images are published to Docker Hub for easy deployment and updates.
 
----
-
-## BREAKING CHANGE ON 2025-06-19 (still 2.2.0.4)
-* The Docker image base was migrated from `ubuntu:24.04` to `ubuntu/dotnet-deps:8.0` to provide a lighter, .NET-ready environment for the SRS server. This change improves build speed and reduces image size, while ensuring compatibility with the .NET 8 runtime required by the latest SRS Linux CLI binaries.
-* The work directory changed from /opt/srs to /app toi follow common practice, you may have to change the way you initiate the container to reflect this path change.
-
----
-
 ## Benefits
 
 - **Automated Build Pipeline:**  
