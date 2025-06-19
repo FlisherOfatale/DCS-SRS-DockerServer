@@ -11,6 +11,12 @@ Built images are published to Docker Hub for easy deployment and updates.
 
 ---
 
+## BREAKING CHANGE ON 2025-06-19 (still 2.2.0.4)
+* The Docker image base was migrated from `ubuntu:24.04` to `ubuntu/dotnet-deps:8.0` to provide a lighter, .NET-ready environment for the SRS server. This change improves build speed and reduces image size, while ensuring compatibility with the .NET 8 runtime required by the latest SRS Linux CLI binaries.
+* The work directory changed from /opt/srs to /app toi follow common practice, you may have to change the way you initiate the container to reflect this path change.
+
+---
+
 ## Benefits
 
 - **Automated Build Pipeline:**  
@@ -35,8 +41,8 @@ All images are published to:
 - **Tag format:**  
   `srs-<srstag>`
 - **Example:**  
-  `flisher/dcs-srs-server:srs-2.2.0.2`  
-  This image is created by using the pre-compiled binary  included in the SRS release [2.2.0.2](https://github.com/ciribob/DCS-SimpleRadioStandalone/releases/tag/2.2.0.2).
+  `flisher/dcs-srs-server:srs-2.2.0.4`  
+  This image is created by using the pre-compiled binary  included in the SRS release [2.2.0.4](https://github.com/ciribob/DCS-SimpleRadioStandalone/releases/tag/2.2.0.4).
 
 ### 2. Based on Latest Commit from SRS Master Branch
 
@@ -56,7 +62,7 @@ All images are published to:
 - **Tag format:**  
   `compiled-<srstag>`
 - **Example:**  
-  `flisher/dcs-srs-server:compiled-2.2.0.2`  
+  `flisher/dcs-srs-server:compiled-2.2.0.4`  
   This image is built by compiling the SRS ServerCommandLine Linux binary **in the cloud as part of the workflow**, using the source code from the associated SRS release tag.
 
 ---
@@ -72,13 +78,13 @@ docker pull flisher/dcs-srs-server:latest
 ### Pulling a Released version using a binary compiled from the source linked to that release
 
 ```sh
-docker pull flisher/dcs-srs-server:compiled-2.2.0.2
+docker pull flisher/dcs-srs-server:compiled-2.2.0.4
 ```
 
 ### Pulling a Released version using the official binary
 
 ```sh
-docker pull flisher/dcs-srs-server:srs-2.2.0.2
+docker pull flisher/dcs-srs-server:srs-2.2.0.4
 ```
 These should ideally be launhed from as a docker compose.  
 This project isn't intented to provide all instruction, but simply provide Docker Images to suit various tastes.
@@ -98,3 +104,11 @@ This project is **not an official project** of Ciribob, nor is it affiliated wit
 It is a personal effort to support DCS SRS ecosystem by providing automated and traceable Docker images for the Linux CLI version of the SRS server.
 
 This project might be temporary and may cease to exist if an official image is provided as part an tracable pipeline.
+
+---
+
+## BREAKING CHANGE RON 2025-06-19
+* The Docker image base was migrated from `ubuntu:24.04` to `ubuntu/dotnet-deps:8.0` to provide a lighter, .NET-ready environment for the SRS server. This change improves build speed and reduces image size, while ensuring compatibility with the .NET 8 runtime required by the latest SRS Linux CLI binaries.
+* The work directory changed from /opt/srs to /app toi follow common practice, you may have to change the way you initiate the container to reflect this path change.
+
+---

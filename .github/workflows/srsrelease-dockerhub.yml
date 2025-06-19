@@ -50,16 +50,13 @@ jobs:
           fi
           echo "tag=$TAG" >> $GITHUB_OUTPUT
 
-      - name: Download SRS release zip
+      - name: Download SRS release binary
         run: |
-          ASSET_URL=$(curl -s https://api.github.com/repos/ciribob/DCS-SimpleRadioStandalone/releases/tags/${{ steps.get_srs_tag.outputs.tag }} | jq -r '.assets[] | select(.name | test("^DCS-SimpleRadioStandalone-.*\\.zip$")) | .browser_download_url')
-          if [ -z "$ASSET_URL" ]; then
-            echo "Could not find DCS-SimpleRadioStandalone-<version>.zip asset for tag ${{ steps.get_srs_tag.outputs.tag }}"
-            exit 1
-          fi
-          curl -L "$ASSET_URL" -o DCS-SimpleRadioStandalone.zip
+          TAG="${{ steps.get_srs_tag.outputs.tag }}"
+          URL="https://github.com/ciribob/DCS-SimpleRadioStandalone/releases/download/${TAG}/SRS-Server-Commandline"
           mkdir -p install-build/ServerCommandLine-Linux
-          unzip -j DCS-SimpleRadioStandalone.zip 'ServerCommandLine-Linux/SRS-Server-Commandline' -d install-build/ServerCommandLine-Linux/SRS-Server-Commandline
+          curl -L "$URL" -o install-build/ServerCommandLine-Linux/SRS-Server-Commandline
+          chmod +x install-build/ServerCommandLine-Linux/SRS-Server-Commandline
 
       - name: Set Docker tags
         id: set_tags
