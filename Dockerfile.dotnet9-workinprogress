@@ -1,0 +1,39 @@
+# Stage 1: Build stage
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /src
+
+# Install prerequisites for NativeAOT
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    clang zlib1g-dev libc6-dev && \
+    rm -rf /var/lib/apt/lists/*
+    
+# Copy csproj files first (better caching of restore)
+COPY external-repo/ServerCommandLine/ServerCommandLine.csproj ./ServerCommandLine/
+# (add other project files here if needed)
+COPY external-repo/*.sln ./
+
+# Restore dependencies
+RUN dotnet restore "./ServerCommandLine/ServerCommandLine.csproj"
+
+# Copy full source now
+COPY external-repo/ ./
+
+# Publish (AOT, self-contained, trimmed)
+RUN dotnet publish "$externalRepoPath/ServerCommandLine/ServerCommandLine.csproj" \
+    --runtime linux-x64 \
+    --output "$outputPath/ServerCommandLine-Linux" \
+    --self-contained true \
+    --configuration Release \
+    /p:PublishReadyToRun=true \
+    /p:PublishSingleFile=true \
+    /p:DebugType=None \
+    /p:DebugSymbols=false \
+    /p:IncludeSourceRevisionInInformationalVersion=false \
+    /p:SourceLinkCreate=false
+
+
+# Stage 2: Minimal runtime image
+FROM scratch
+COPY --from=build /src/install-build/ServerCommandLine-Linux /app
+WORKDIR /app
+ENTRYPOINT ["/app/ServerCommandLine"]

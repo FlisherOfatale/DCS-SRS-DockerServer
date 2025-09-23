@@ -69,6 +69,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./Dockerfile
+          file: ./Dockerfile-dotNet8
           push: true
           tags: ${{ steps.set_tags.outputs.tags }}

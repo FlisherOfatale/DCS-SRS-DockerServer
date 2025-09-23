@@ -44,15 +44,7 @@ jobs:
           fi
 
       - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Get SRS commit SHA (if srs_tag is set)
-        id: srs_commit
-        if: ${{ steps.normalize.outputs.srs_tag != '' }}
-        run: |
-          TAG="${{ steps.normalize.outputs.srs_tag }}"
-          SHA=$(curl -s https://api.github.com/repos/ciribob/DCS-SimpleRadioStandalone/git/refs/tags/$TAG | jq -r '.object.sha')
-          echo "sha=$SHA" >> $GITHUB_OUTPUT
+        uses: actions/checkout@v4
 
       - name: Checkout DCS-SimpleRadioStandalone repository
         uses: actions/checkout@v4
@@ -69,17 +61,6 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Set up .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.0.x'
-
-      - name: Build .NET Server (Linux)
-        run: |
-          chmod +x ./build.sh
-          ./build.sh
-        shell: bash
 
       - name: Get external-repo commit SHA
         id: srs_sha

@@ -6,13 +6,13 @@
 set -e
 
 # Clone the external repo (shallow clone)
-echo "Cloning ciribob/DCS-SimpleRadioStandalone into ./external-repos..."
-rm -rf ./external-repos
-git clone --depth 1 https://github.com/ciribob/DCS-SimpleRadioStandalone.git ./external-repos
+echo "Cloning ciribob/DCS-SimpleRadioStandalone into ./external-repo..."
+rm -rf ./external-repo
+git clone --depth 1 https://github.com/ciribob/DCS-SimpleRadioStandalone.git ./external-repo
 
 # Build the Linux server binary
-echo "Building Server CLI binary for Linux..."
-chmod +x ./build.sh
+echo "Building Server CLI binary for Linux... DotnetV9"
+chmod +x ./linuxbuild.sh
 ./build.sh
 
 # Build the Docker container

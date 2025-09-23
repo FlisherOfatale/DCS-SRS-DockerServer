@@ -3,3 +3,6 @@ external-repos/
 
 # Ignore build artifacts
 install-build/
+
+# SRS Files
+server.cfg
