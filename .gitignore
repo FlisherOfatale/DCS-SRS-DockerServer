@@ -1,8 +1,9 @@
 # Ignore local clone of external repository
-external-repos/
+external-repo
 
 # Ignore build artifacts
 install-build/
 
 # SRS Files
 server.cfg
+
