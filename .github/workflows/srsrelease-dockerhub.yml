@@ -41,4 +41,8 @@ jobs:
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
         run: |
           chmod +x scripts/build-from-binary.sh
-          scripts/build-from-binary.sh ${{ github.event.inputs.srs_tag || '' }} --publish ${{ github.event.inputs.tag_latest == 'true' && '--latest' || '' }}
+          if [ -n "${{ github.event.inputs.srs_tag || github.event.client_payload.srs_tag }}" ]; then
+            scripts/build-from-binary.sh "${{ github.event.inputs.srs_tag || github.event.client_payload.srs_tag }}" --publish ${{ github.event.inputs.tag_latest == 'true' && '--latest' || '' }}
+          else
+            scripts/build-from-binary.sh --publish ${{ github.event.inputs.tag_latest == 'true' && '--latest' || '' }}
+          fi

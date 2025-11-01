@@ -14,9 +14,8 @@ on:
           - 'true'
           - 'false'
       srs_tag:
-        description: 'Optional: SRS release tag to build from (e.g. 2.3.2.2)'
-        required: false
-        default: ''
+        description: 'SRS release tag to build from (e.g. 2.3.2.2)'
+        required: true
 
 jobs:
   build:
@@ -41,4 +40,4 @@ jobs:
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
         run: |
           chmod +x scripts/build-and-push.sh
-          scripts/build-and-push.sh ${{ github.event.inputs.srs_tag || '' }} --publish ${{ github.event.inputs.tag_latest == 'true' && '--latest' || '' }}
+          scripts/build-and-push.sh ${{ github.event.inputs.srs_tag || github.event.client_payload.srs_tag }} --publish ${{ github.event.inputs.tag_latest == 'true' && '--latest' || '' }}

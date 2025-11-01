@@ -43,10 +43,31 @@ validate_binary_build_environment() {
 get_latest_srs_release() {
     echo "Step 1: Getting latest SRS release tag..." >&2
     
-    # Use the validation library function
-    if ! get_latest_validated_srs_tag "build-from-binary.sh"; then
+    local response
+    response=$(curl --silent --show-error --fail \
+        "https://api.github.com/repos/ciribob/DCS-SimpleRadioStandalone/releases" 2>/dev/null)
+    
+    if [ $? -ne 0 ]; then
+        echo "Error: Failed to fetch releases from ciribob/DCS-SimpleRadioStandalone" >&2
         return 1
     fi
+    
+    local tag
+    tag=$(echo "$response" | jq -r '.[0].tag_name')
+    
+    if [ "$tag" = "null" ] || [ -z "$tag" ]; then
+        echo "Error: No valid tag found in releases" >&2
+        return 1
+    fi
+    
+    # Validate the retrieved tag format
+    if ! validate_srs_tag "$tag"; then
+        echo "Error: Latest SRS release tag failed validation: '$tag'" >&2
+        return 1
+    fi
+    
+    echo "    Latest release: $tag" >&2
+    echo "$tag"
 }
 
 # Function to download SRS binary from GitHub releases
@@ -58,8 +79,8 @@ download_srs_binary() {
         return 1
     fi
     
-    # Validate tag format and existence
-    if ! validate_srs_tag_exists "$srs_tag" "build-from-binary.sh"; then
+    # Validate tag format first
+    if ! validate_srs_tag "$srs_tag"; then
         return 1
     fi
     

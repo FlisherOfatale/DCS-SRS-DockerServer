@@ -87,17 +87,16 @@ generate_docker_tags() {
     
     local tags=""
     
-    if [ -n "$srs_tag" ]; then
-        # Building from a specific tag - use the tag name directly (new pattern)
-        tags="${username}/dcs-srs-server:${srs_tag}"
-        echo "    Primary tag: ${srs_tag}" >&2
-    else
-        # Building from master - use date-commit pattern
-        local date_tag
-        date_tag=$(date +%Y%m%d)
-        tags="${username}/dcs-srs-server:${date_tag}-${SRS_COMMIT_SHA}"
-        echo "    Primary tag: ${date_tag}-${SRS_COMMIT_SHA}" >&2
+    # Require a valid SRS tag - no default behavior
+    if [ -z "$srs_tag" ] || [ "$srs_tag" = "" ]; then
+        echo "Error: SRS tag is required. Provide a specific release tag (e.g., 2.3.2.2)" >&2
+        echo "Usage: $0 <tag> [--publish] [--latest]" >&2
+        return 1
     fi
+    
+    # Building from a specific tag - use the tag name directly
+    tags="${username}/dcs-srs-server:${srs_tag}"
+    echo "    Primary tag: ${srs_tag}" >&2
     
     # Add latest tag if requested
     if [ "$tag_latest" = "true" ]; then
@@ -218,11 +217,14 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
                 ;;
             *)
                 if [ -z "$SRS_TAG" ]; then
-                    # Validate the tag format
-                    if ! validate_srs_tag "$1"; then
-                        exit 1
+                    # Skip empty arguments from workflow
+                    if [ -n "$1" ]; then
+                        # Validate the tag format
+                        if ! validate_srs_tag "$1"; then
+                            exit 1
+                        fi
+                        SRS_TAG="$1"
                     fi
-                    SRS_TAG="$1"
                 else
                     echo "Error: Multiple tags provided. Only one tag is allowed." >&2
                     exit 1
