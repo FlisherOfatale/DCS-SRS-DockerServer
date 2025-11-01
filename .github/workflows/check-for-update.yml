@@ -2,84 +2,37 @@ name: Check Update from SRS Repository
 
 on:
   schedule:
-    - cron: '30 2 * * *' # Runs every 30 minutes past the hour
+    - cron: '30 2 * * *' # Runs daily at 2:30 AM
   workflow_dispatch:
 
 jobs:
   check-and-trigger:
     runs-on: ubuntu-latest
     steps:
-      - name: Get latest SRS release tag (including pre-releases)
-        id: get_tag
-        run: |
-          TAG=$(curl -s https://api.github.com/repos/ciribob/DCS-SimpleRadioStandalone/releases | jq -r '.[0].tag_name')
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Check if Docker Hub tag exists (srs-TAG)
-        id: check_srs
+      - name: Make scripts executable
+        run: chmod +x scripts/*.sh
+
+      - name: Check SRS tags and trigger workflows if needed
+        env:
+          PAT_REPO_DISPATCH: ${{ secrets.PAT_REPO_DISPATCH }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
         run: |
-          TAG="${{ steps.get_tag.outputs.tag }}"
-          EXISTS=$(curl -s "https://hub.docker.com/v2/repositories/flisher/dcs-srs-server/tags/srs-${TAG}/" | jq -r '.name // empty')
-          if [ "$EXISTS" = "srs-${TAG}" ]; then
-            echo "exists=true" >> $GITHUB_OUTPUT
-          else
-            echo "exists=false" >> $GITHUB_OUTPUT
+          # Validate required secrets are present
+          if [ -z "$PAT_REPO_DISPATCH" ]; then
+            echo "Error: PAT_REPO_DISPATCH secret is not set"
+            exit 1
           fi
-
-      - name: Check if Docker Hub tag exists (compiled-TAG)
-        id: check_compiled
-        run: |
-          TAG="${{ steps.get_tag.outputs.tag }}"
-          EXISTS=$(curl -s "https://hub.docker.com/v2/repositories/flisher/dcs-srs-server/tags/compiled-${TAG}/" | jq -r '.name // empty')
-          if [ "$EXISTS" = "compiled-${TAG}" ]; then
-            echo "exists=true" >> $GITHUB_OUTPUT
-          else
-            echo "exists=false" >> $GITHUB_OUTPUT
+          if [ -z "$DOCKERHUB_USERNAME" ]; then
+            echo "Error: DOCKERHUB_USERNAME secret is not set"  
+            exit 1
           fi
-
-      - name: Trigger srsrelease-dockerhub.yml if srs-TAG is missing
-        if: steps.check_srs.outputs.exists == 'false'
-        run: |
-          curl -X POST \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${{ secrets.PAT_REPO_DISPATCH }}" \
-            https://api.github.com/repos/${{ github.repository }}/dispatches \
-            -d '{"event_type":"srsrelease","client_payload":{"srs_tag":"${{ steps.get_tag.outputs.tag }}"}}'
-
-      - name: Trigger linuxbuild-dockerhub.yml if compiled-TAG is missing
-        if: steps.check_compiled.outputs.exists == 'false'
-        run: |
-          curl -X POST \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${{ secrets.PAT_REPO_DISPATCH }}" \
-            https://api.github.com/repos/${{ github.repository }}/dispatches \
-            -d '{"event_type":"linuxbuild-from-SRS-release","client_payload":{"srs_tag":"${{ steps.get_tag.outputs.tag }}"}}'
-
-      - name: Get latest commit short SHA from master
-        id: get_master_sha
-        run: |
-          SHA=$(curl -s https://api.github.com/repos/ciribob/DCS-SimpleRadioStandalone/commits/master | jq -r '.sha')
-          SHORTSHA=$(echo $SHA | cut -c1-7)
-          DATE=$(date +%Y%m%d)
-          echo "shortsha=$SHORTSHA" >> $GITHUB_OUTPUT
-
-      - name: Check if Docker Hub tag exists (*-SHORTSHA)
-        id: check_compiled_sha
-        run: |
-          SHORTSHA="${{ steps.get_master_sha.outputs.shortsha }}"
-          # Get all tags and check if any end with -SHORTSHA (regardless of prefix)
-          EXISTS=$(curl -s "https://hub.docker.com/v2/repositories/flisher/dcs-srs-server/tags/?page_size=100" | jq -r '.results[].name' | grep -E "\-${SHORTSHA}$" || true)
-          if [ -n "$EXISTS" ]; then
-            echo "exists=true" >> $GITHUB_OUTPUT
-          else
-            echo "exists=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Trigger linuxbuild-dockerhub.yml for master commit if missing
-        if: steps.check_compiled_sha.outputs.exists == 'false'
-        run: |
-          curl -X POST \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${{ secrets.PAT_REPO_DISPATCH }}" \
-            https://api.github.com/repos/${{ github.repository }}/dispatches \
-            -d '{"event_type":"linuxbuild-from-SRS-commit","client_payload":{"srs_tag":"","tag_latest":"true"}}'
+          
+          # Run the script which will:
+          # 1. Get the latest SRS release tag
+          # 2. Check if corresponding Docker Hub tags exist
+          # 3. Automatically trigger workflows for missing tags
+          scripts/check-git-release.sh
