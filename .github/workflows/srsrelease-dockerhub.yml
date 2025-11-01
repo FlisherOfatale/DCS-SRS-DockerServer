@@ -1,10 +1,18 @@
-name: SRS Release to DockerHub
+name: Ciribob Binary to DockerHub
 
 on:
   repository_dispatch:
-    types: [srsrelease]
+    types: [ciribob-binary-to-dockerhub]
   workflow_dispatch:
     inputs:
+      tag_latest:
+        description: 'Also tag as ciribob-latest on DockerHub?'
+        required: true
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
       srs_tag:
         description: 'SRS Version tag (optional, defaults to latest SRS Release)'
         required: false
@@ -16,7 +24,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -27,48 +35,10 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Normalize inputs (srs_tag)
-        id: normalize
+      - name: Build and push Docker image from binary
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
         run: |
-          # Normalize srs_tag
-          if [ -n "${{ github.event.inputs.srs_tag }}" ]; then
-            echo "srs_tag=${{ github.event.inputs.srs_tag }}" >> $GITHUB_OUTPUT
-          elif [ -n "${{ github.event.client_payload.srs_tag }}" ]; then
-            echo "srs_tag=${{ github.event.client_payload.srs_tag }}" >> $GITHUB_OUTPUT
-          else
-            echo "srs_tag=" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Get SRS release tag
-        id: get_srs_tag
-        run: |
-          if [ -z "${{ steps.normalize.outputs.srs_tag }}" ]; then
-            # Get the most recent release (including pre-releases)
-            TAG=$(curl -s https://api.github.com/repos/ciribob/DCS-SimpleRadioStandalone/releases | jq -r '.[0].tag_name')
-          else
-            TAG="${{ steps.normalize.outputs.srs_tag }}"
-          fi
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
-
-      - name: Download SRS release binary
-        run: |
-          TAG="${{ steps.get_srs_tag.outputs.tag }}"
-          URL="https://github.com/ciribob/DCS-SimpleRadioStandalone/releases/download/${TAG}/SRS-Server-Commandline"
-          mkdir -p install-build/ServerCommandLine-Linux
-          curl -L "$URL" -o install-build/ServerCommandLine-Linux/SRS-Server-Commandline
-          chmod +x install-build/ServerCommandLine-Linux/SRS-Server-Commandline
-
-      - name: Set Docker tags
-        id: set_tags
-        run: |
-          TAG="${{ steps.get_srs_tag.outputs.tag }}"
-          TAGS="${{ secrets.DOCKERHUB_USERNAME }}/dcs-srs-server:srs-${TAG}"
-          echo "tags=$TAGS" >> $GITHUB_OUTPUT
-
-      - name: Build and Push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./Dockerfile-dotNet8
-          push: true
-          tags: ${{ steps.set_tags.outputs.tags }}
+          chmod +x scripts/build-from-binary.sh
+          scripts/build-from-binary.sh ${{ github.event.inputs.srs_tag || '' }} --publish ${{ github.event.inputs.tag_latest == 'true' && '--latest' || '' }}
