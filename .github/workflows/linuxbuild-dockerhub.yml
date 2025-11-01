@@ -40,4 +40,4 @@ jobs:
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
         run: |
           chmod +x scripts/build-and-push.sh
-          scripts/build-and-push.sh ${{ github.event.inputs.srs_tag || github.event.client_payload.srs_tag }} --publish ${{ github.event.inputs.tag_latest == 'true' && '--latest' || '' }}
+          scripts/build-and-push.sh ${{ github.event.inputs.srs_tag || github.event.client_payload.srs_tag }} --publish ${{ (github.event.inputs.tag_latest == 'true' || github.event.client_payload.tag_latest == 'true') && '--latest' || '' }}

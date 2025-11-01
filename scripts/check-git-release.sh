@@ -164,7 +164,7 @@ trigger_workflow() {
     local payload
     case "$event_type" in
         "ciribob-binary-to-dockerhub")
-            payload="{\"event_type\":\"ciribob-binary-to-dockerhub\",\"client_payload\":{\"srs_tag\":\"$srs_tag\"}}"
+            payload="{\"event_type\":\"ciribob-binary-to-dockerhub\",\"client_payload\":{\"srs_tag\":\"$srs_tag\",\"tag_latest\":\"$tag_latest\"}}"
             ;;
         "clean-build-to-dockerhub")
             payload="{\"event_type\":\"clean-build-to-dockerhub\",\"client_payload\":{\"srs_tag\":\"$srs_tag\",\"tag_latest\":\"$tag_latest\"}}"
@@ -216,7 +216,7 @@ handle_missing_tags() {
     # If ciribob-TAG doesn't exist, trigger ciribob binary workflow
     if [ "${CIRIBOB_TAG_EXISTS:-false}" = "false" ]; then
         echo "    Missing: ciribob-${srs_tag} → triggering ciribob-binary-to-dockerhub" >&2
-        trigger_workflow "ciribob-binary-to-dockerhub" "$srs_tag"
+        trigger_workflow "ciribob-binary-to-dockerhub" "$srs_tag" "true"
     fi
     
     # If TAG doesn't exist, trigger clean build workflow
