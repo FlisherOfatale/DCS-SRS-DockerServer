@@ -24,14 +24,11 @@ RUN OUTPUT_PATH="./install-build" && \
         /p:DebugSymbols=false \
         /p:IncludeSourceRevisionInInformationalVersion=false && \
     find "$OUTPUT_PATH/ServerCommandLine-Linux" -name "*.dll" -type f -delete 2>/dev/null || true
-RUN ls -altr ./install-build/ServerCommandLine-Linux/
-RUN ls -altr ./install-build/ServerCommandLine-Linux/SRS-Server-Commandline* -altr
-
 
 FROM ubuntu/dotnet-deps:9.0 AS runtime
 WORKDIR /app
 
 
-COPY --from=build /src/install-build/ServerCommandLine-Linux/SRS-Server-Commandline-Linux ./SRS-Server-Commandline-Linux
+COPY --from=build /src/./install-build/ServerCommandLine-Linux/SRS-Server-Commandline ./SRS-Server-Commandline-Linux
 
 ENTRYPOINT [ "./SRS-Server-Commandline-linux" ]
