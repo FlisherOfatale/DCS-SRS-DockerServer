@@ -31,4 +31,4 @@ WORKDIR /app
 
 COPY --from=build /src/./install-build/ServerCommandLine-Linux/SRS-Server-Commandline ./SRS-Server-Commandline-Linux
 
-ENTRYPOINT [ "./SRS-Server-Commandline-linux" ]
+ENTRYPOINT [ "./SRS-Server-Commandline-Linux" ]
