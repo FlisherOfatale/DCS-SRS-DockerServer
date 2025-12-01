@@ -61,7 +61,7 @@ services:
     ports:
       - "5002:5002/udp"
       - "5002:5002/tcp"
-    command: ["./SRS-Server-Commandline", "--enableEAM=true", "--coalitionSecurity=true", "--eamBluePassword=BLUE", "--eamRedPassword=RED", "--consoleLogs", "--showTransmitterName=true"]
+    command: ["./SRS-Server-Commandline-Linux", "--enableEAM=true", "--coalitionSecurity=true", "--eamBluePassword=BLUE", "--eamRedPassword=RED", "--consoleLogs", "--showTransmitterName=true"]
 ```
 
 ## Related Links
@@ -97,6 +97,10 @@ This project is **not an official project** of Ciribob, nor is it affiliated wit
 ---
 
 ## Recent Changes
+
+### BREAKIN CHANGE ON 2025-12-01
+- **Renamed Executable** from `SRS-Server-Commandline` to `SRS-Server-Commandline-Linux` to match new official Ciribob name
+
 
 ### MAJOR CHANGE ON 2025-10-31
 - **New comprehensive tagging structure** with clear variant separation

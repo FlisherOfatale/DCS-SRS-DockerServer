@@ -91,7 +91,7 @@ download_srs_binary() {
     mkdir -p "$OUTPUT_DIR"
     
     # Download binary
-    local url="https://github.com/${SRS_REPO}/releases/download/${srs_tag}/SRS-Server-Commandline"
+    local url="https://github.com/${SRS_REPO}/releases/download/${srs_tag}/SRS-Server-Commandline-Linux"
     echo "    URL: $url" >&2
     
     local temp_file
@@ -110,11 +110,11 @@ download_srs_binary() {
     fi
     
     # Move to final location and set permissions
-    mv "$temp_file" "$OUTPUT_DIR/SRS-Server-Commandline"
-    chmod +x "$OUTPUT_DIR/SRS-Server-Commandline"
+    mv "$temp_file" "$OUTPUT_DIR/SRS-Server-Commandline-Linux"
+    chmod +x "$OUTPUT_DIR/SRS-Server-Commandline-Linux"
     
     local file_size
-    file_size=$(stat -c%s "$OUTPUT_DIR/SRS-Server-Commandline" 2>/dev/null || stat -f%z "$OUTPUT_DIR/SRS-Server-Commandline" 2>/dev/null || echo "unknown")
+    file_size=$(stat -c%s "$OUTPUT_DIR/SRS-Server-Commandline-Linux" 2>/dev/null || stat -f%z "$OUTPUT_DIR/SRS-Server-Commandline-Linux" 2>/dev/null || echo "unknown")
     echo "    ✓ Downloaded binary ($file_size bytes)" >&2
 }
 

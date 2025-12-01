@@ -28,6 +28,6 @@ RUN OUTPUT_PATH="./install-build" && \
 FROM ubuntu/dotnet-deps:9.0 AS runtime
 WORKDIR /app
 
-COPY --from=build /src/install-build/ServerCommandLine-Linux/SRS-Server-Commandline .
+COPY --from=build /src/install-build/ServerCommandLine-Linux/SRS-Server-Commandline-Linux ./SRS-Server-Commandline-Linux
 
 ENTRYPOINT [ "./SRS-Server-Commandline" ]

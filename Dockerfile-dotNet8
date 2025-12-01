@@ -10,9 +10,9 @@ WORKDIR /app
 # Copy the SRS server Linux CLI executable and startup script from the build context
 # The source binary path was choosed to be future proof if the binary build become part of the same pipeline
 # In order to build the container image properly, the docker build or pipeline must run in the context of the root of the repository
-COPY --chown=101:101 --chmod=+x ./install-build/ServerCommandLine-Linux/SRS-Server-Commandline .
+COPY --chown=101:101 --chmod=+x ./install-build/ServerCommandLine-Linux/SRS-Server-Commandline-Linux .
 
 # Define the default command to run when the container starts
 # The entrypoint script will handle the application startup
 # Set the default command to run the server
-ENTRYPOINT ["./SRS-Server-Commandline"]
+ENTRYPOINT ["./SRS-Server-Commandline-Linux"]
