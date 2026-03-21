@@ -1,5 +1,5 @@
 # Use Microsoft's official .NET 9 SDK image
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 
 WORKDIR /src
 
@@ -25,7 +25,7 @@ RUN OUTPUT_PATH="./install-build" && \
         /p:IncludeSourceRevisionInInformationalVersion=false && \
     find "$OUTPUT_PATH/ServerCommandLine-Linux" -name "*.dll" -type f -delete 2>/dev/null || true
 
-FROM ubuntu/dotnet-deps:9.0 AS runtime
+FROM ubuntu/dotnet-deps:10.0 AS runtime
 WORKDIR /app
 
 
