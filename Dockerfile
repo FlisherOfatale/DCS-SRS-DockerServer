@@ -25,7 +25,7 @@ RUN OUTPUT_PATH="./install-build" && \
         /p:IncludeSourceRevisionInInformationalVersion=false && \
     find "$OUTPUT_PATH/ServerCommandLine-Linux" -name "*.dll" -type f -delete 2>/dev/null || true
 
-FROM ubuntu/dotnet-deps:10.0 AS runtime
+FROM mcr.microsoft.com/dotnet/runtime-deps:10.0-noble-chiseled AS runtime
 WORKDIR /app
 
 

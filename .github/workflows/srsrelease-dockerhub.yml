@@ -17,7 +17,8 @@ on:
         description: 'SRS Version tag (optional, defaults to latest SRS Release)'
         required: false
         default: ''
-
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 jobs:
   build:
     runs-on: ubuntu-latest

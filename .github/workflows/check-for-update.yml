@@ -4,10 +4,12 @@ on:
   schedule:
     - cron: '30 2 * * *' # Runs daily at 2:30 AM
   workflow_dispatch:
-
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true    
 jobs:
   check-and-trigger:
     runs-on: ubuntu-latest
+      
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
