@@ -15,7 +15,7 @@ fi
 # Configuration
 readonly SRS_REPO="ciribob/DCS-SimpleRadioStandalone"
 readonly GITHUB_API_BASE="https://api.github.com"
-readonly DOCKERFILE_DEFAULT="Dockerfile-dotNet8"
+readonly DOCKERFILE_DEFAULT="Dockerfile-Ciribob"
 readonly CONTEXT_DEFAULT="."
 readonly DOCKERHUB_USERNAME_DEFAULT="flisher"
 readonly OUTPUT_DIR="install-build/ServerCommandLine-Linux"
